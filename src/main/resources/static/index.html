@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录/注册</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            width: 400px;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input[type="text"], input[type="password"], input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .toggle-link {
+            margin-top: 20px;
+            display: inline-block;
+            color: #007BFF;
+            cursor: pointer;
+        }
+        .toggle-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container" id="loginForm">
+    <h2>登录</h2>
+    <form id="loginForm">
+        <input type="text" id="loginUsername" placeholder="用户名" required>
+        <input type="password" id="loginPassword" placeholder="密码" required>
+        <input type="submit" value="登录">
+    </form>
+    <div class="toggle-link" onclick="showRegisterForm()">没有账号？注册</div>
+</div>
+
+<div class="form-container" id="registerForm" style="display:none;">
+    <h2>注册</h2>
+    <form id="registerForm">
+        <input type="text" id="registerUsername" placeholder="用户名" required>
+        <input type="password" id="registerPassword" placeholder="密码" required>
+        <input type="submit" value="注册">
+    </form>
+    <div class="toggle-link" onclick="showLoginForm()">已有账号？登录</div>
+</div>
+
+<script>
+    function showLoginForm() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let username = document.getElementById('loginUsername').value;
+        let password = document.getElementById('loginPassword').value;
+        loginUser(username, password);
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let username = document.getElementById('registerUsername').value;
+        let password = document.getElementById('registerPassword').value;
+        registerUser(username, password);
+    });
+
+    function registerUser(username, password) {
+        fetch('http://localhost:8080/api/user/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Registration failed');
+            }
+            alert('Registration successful');
+            showLoginForm();
+        })
+        .catch(error => {
+            console.error('Registration error:', error);
+            alert('Registration failed');
+        });
+    }
+
+    function loginUser(username, password) {
+        fetch('http://localhost:8080/api/user/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+            // 登录成功后跳转到 trips.html，并传递用户名
+            window.location.href = `trips.html?username=${username}`;
+        })
+        .catch(error => {
+            console.error('Login error:', error);
+            alert('Login failed');
+        });
+    }
+</script>
+</body>
+</html>

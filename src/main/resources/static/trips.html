@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Management</title>
+    <style>
+        .btn-personal-center {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 5px;
+    text-decoration: none; /* Remove underline from links */
+}
+
+.btn-personal-center:hover {
+    background-color: #0056b3; /* Darker shade of primary color on hover */
+}
+        body {
+         font-family: Arial, sans-serif;
+         margin: 20px;
+         background-color: #f4f4f9;
+     }
+
+     .container {
+         max-width: 1200px;
+         margin: auto;
+         background: white;
+         padding: 20px;
+         border-radius: 8px;
+         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     }
+
+     h1 {
+         color: #333;
+         text-align: center;
+         margin-bottom: 20px;
+     }
+/* 模态框背景 */
+.modal {
+    display: none; /* 默认隐藏 */
+    position: fixed; /* 固定位置 */
+    z-index: 1; /* 在最前面显示 */
+    left: 0;
+    top: 0;
+    width: 100%; /* 全屏宽度 */
+    height: 100%; /* 全屏高度 */
+    overflow: auto; /* 允许滚动 */
+    background-color: rgb(0,0,0); /* 黑色背景 */
+    background-color: rgba(0,0,0,0.4); /* 背景透明 */
+}
+
+/* 模态框内容 */
+.modal-content {
+    background-color: #fefefe; /* 白色背景 */
+    margin: 15% auto; /* 上下边距15%，水平居中 */
+    padding: 20px; /* 内边距 */
+    border: 1px solid #888; /* 边框 */
+    width: 80%; /* 宽度 */
+    max-width: 500px; /* 最大宽度 */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* 阴影效果 */
+    border-radius: 10px; /* 圆角 */
+}
+
+/* 关闭按钮 */
+.close {
+    color: #aaa; /* 颜色 */
+    float: right; /* 右浮动 */
+    font-size: 28px; /* 字体大小 */
+    font-weight: bold; /* 字体加粗 */
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* 悬停和聚焦时颜色 */
+    text-decoration: none; /* 去掉下划线 */
+    cursor: pointer; /* 光标 */
+}
+
+/* 表单输入框 */
+input[type=text], input[type=date], textarea {
+    width: 100%; /* 全宽度 */
+    padding: 12px 20px; /* 内边距 */
+    margin: 8px 0; /* 外边距 */
+    display: inline-block; /* 内联块 */
+    border: 1px solid #ccc; /* 边框 */
+    border-radius: 4px; /* 圆角 */
+    box-sizing: border-box; /* 包括内边距和边框 */
+}
+
+/* 提交按钮 */
+input[type=submit] {
+    width: 100%; /* 全宽度 */
+    background-color: #4CAF50; /* 背景色 */
+    color: white; /* 字体颜色 */
+    padding: 14px 20px; /* 内边距 */
+    margin: 8px 0; /* 外边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 4px; /* 圆角 */
+    cursor: pointer; /* 光标 */
+}
+
+input[type=submit]:hover {
+    background-color: #45a049; /* 悬停时背景色 */
+}
+
+/* 表单标签 */
+form {
+    display: flex; /* 使用弹性布局 */
+    flex-direction: column; /* 竖直方向 */
+    align-items: center; /* 水平居中 */
+}
+
+form input, form textarea {
+    margin-bottom: 10px; /* 底部外边距 */
+}
+
+     .btn {
+         padding: 10px 20px;
+         border: none;
+         border-radius: 3px;
+         cursor: pointer;
+         margin: 5px;
+     }
+
+     .btn-add {
+         background-color: #28a745;
+         color: white;
+     }
+
+     .modal {
+         display: none;
+         position: fixed;
+         z-index: 1;
+         left: 0;
+         top: 0;
+         width: 100%;
+         height: 100%;
+         overflow: auto;
+         background-color: rgba(0, 0, 0, 0.4);
+     }
+
+     .modal-content {
+         background-color: #fefefe;
+         margin: 15% auto;
+         padding: 20px;
+         border: 1px solid #888;
+         width: 80%;
+         max-width: 500px;
+         border-radius: 8px;
+         position: relative;
+     }
+
+     .close {
+         color: #aaa;
+         position: absolute;
+         top: 10px;
+         right: 10px;
+         font-size: 24px;
+         cursor: pointer;
+     }
+
+     table {
+         width: 100%;
+         border-collapse: collapse;
+         margin-top: 20px;
+     }
+
+     table, th, td {
+         border: 1px solid #ccc;
+         padding: 10px;
+         text-align: center;
+     }
+
+     th {
+         background-color: #f2f2f2;
+     }
+
+     .search-form {
+         margin-bottom: 20px;
+     }
+
+     .search-input {
+         padding: 10px;
+         margin-right: 10px;
+         border: 1px solid #ccc;
+         border-radius: 3px;
+         box-sizing: border-box;
+         width: 200px;
+     }
+
+     .btn-search {
+         background-color: #007bff;
+         color: white;
+         border: none;
+         padding: 10px 20px;
+         border-radius: 3px;
+         cursor: pointer;
+     }
+
+     .btn-edit {
+         background-color: #ffc107;
+         color: white;
+     }
+
+     .btn-delete {
+         background-color: #dc3545;
+         color: white;
+     }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>行程管理</h1>
+    <button class="btn btn-add" onclick="openAddModal()">添加行程</button>
+    <a href="personal_center.html?username=${username}" class="btn btn-personal-center">个人中心</a>
+    <!-- 行程登记表单（模态框） -->
+    <div id="tripModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">添加行程</h2>
+            <form id="tripForm">
+                <input type="hidden" id="tripId">
+                <input type="text" id="destination" name="destination" placeholder="目的地" required>
+                <br>
+                <input type="date" id="startDate" name="startDate" required>
+                <br>
+                <input type="date" id="endDate" name="endDate" required>
+                <br>
+                <textarea id="description" name="description" placeholder="描述"></textarea>
+                <br>
+                <input type="hidden" id="username" name="username" value="123">
+                <input type="submit" value="保存">
+            </form>
+        </div>
+    </div>
+
+    <!-- 行程管理表格 -->
+    <div class="table-container">
+        <h2>行程列表</h2>
+        <form id="searchForm">
+            <input type="text" id="searchInput" placeholder="输入目的地搜索..." style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 200px;">
+            <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">搜索</button>
+
+        </form>
+        <table>
+            <thead>
+            <tr>
+                <th>目的地</th>
+                <th>开始日期</th>
+                <th>结束日期</th>
+                <th>描述</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="tripList">
+            <!-- 行程将通过 JavaScript 动态加载 -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const username = new URLSearchParams(window.location.search).get('username');
+    document.getElementById('username').value = username;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadUserTrips(username);
+        loadTripStatistics(username);
+    });
+
+    // 行程登记表单提交事件
+    document.getElementById('tripForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let tripId = document.getElementById('tripId').value;
+        let destination = document.getElementById('destination').value;
+        let startDate = document.getElementById('startDate').value;
+        let endDate = document.getElementById('endDate').value;
+        let description = document.getElementById('description').value;
+        let username = document.getElementById('username').value;
+
+        if (tripId) {
+            updateTrip(tripId, destination, startDate, endDate, description, username);
+        } else {
+            registerTrip(destination, startDate, endDate, description, username);
+        }
+    });
+
+    // 表单提交事件监听
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let searchTerm = document.getElementById('searchInput').value;
+        searchTrips(searchTerm, username);
+    });
+
+    // 打开添加行程模态框
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = '添加行程';
+        document.getElementById('tripId').value = '';
+        document.getElementById('destination').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('tripModal').style.display = 'block';
+    }
+
+    // 打开编辑行程模态框
+    function openEditModal(tripId) {
+        fetch(`http://localhost:8080/api/trip/${tripId}`)
+        .then(response => response.json())
+        .then(trip => {
+            document.getElementById('modalTitle').textContent = '编辑行程';
+            document.getElementById('tripId').value = trip.id;
+            document.getElementById('destination').value = trip.destination;
+            document.getElementById('startDate').value = trip.startDate;
+            document.getElementById('endDate').value = trip.endDate;
+            document.getElementById('description').value = trip.description;
+            document.getElementById('tripModal').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching trip:', error);
+            alert('无法加载行程信息');
+        });
+    }
+
+    // 关闭模态框
+    function closeModal() {
+        document.getElementById('tripModal').style.display = 'none';
+    }
+
+    // 注册行程函数
+    function registerTrip(destination, startDate, endDate, description, username) {
+        fetch('http://localhost:8080/api/trip/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ destination, startDate, endDate, description, username })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Trip registration failed');
+            return response.json();
+        })
+        .then(data => {
+            alert('Trip registered successfully');
+            loadUserTrips(username);
+            closeModal();
+        })
+        .catch(error => {
+            console.error('Trip registration error:', error);
+            location.reload();
+        });
+    }
+
+    // 更新行程函数
+    function updateTrip(id, destination, startDate, endDate, description, username) {
+        fetch(`http://localhost:8080/api/trip/update/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ destination, startDate, endDate, description, username })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Trip update failed');
+            return response.json();
+        })
+        .then(data => {
+            alert('Trip updated successfully');
+            loadUserTrips(username);
+            closeModal();
+        })
+        .catch(error => {
+            console.error('Trip update error:', error);
+            location.reload();
+        });
+    }
+
+    // 删除行程函数
+    function deleteTrip(id) {
+        if (confirm('确定要删除这条行程吗？')) {
+            fetch(`http://localhost:8080/api/trip/delete/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Trip deletion failed');
+                return response.json();
+            })
+            .then(data => {
+                alert('Trip deleted successfully');
+                loadUserTrips(username);
+            })
+            .catch(error => {
+                console.error('Trip deletion error:', error);
+                location.reload();
+            });
+        }
+    }
+
+    // 加载用户行程列表
+    function loadUserTrips(username) {
+        fetch(`http://localhost:8080/api/trip/list?username=${username}`)
+        .then(response => response.json())
+        .then(trips => {
+            const tripList = document.getElementById('tripList');
+            tripList.innerHTML = '';
+            trips.forEach(trip => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${trip.destination}</td>
+                    <td>${trip.startDate}</td>
+                    <td>${trip.endDate}</td>
+                    <td>${trip.description}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="openEditModal(${trip.id})">编辑</button>
+                        <button class="btn btn-delete" onclick="deleteTrip(${trip.id})">删除</button>
+                    </td>
+                `;
+                tripList.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading user trips:', error);
+            alert('无法加载行程列表');
+        });
+    }
+
+document.querySelector('.btn-personal-center').addEventListener('click', function(event) {
+    event.preventDefault();
+    window.location.href = `personal_center.html?username=${username}`;
+});
+
+    // 搜索行程函数
+    function searchTrips(searchTerm, username) {
+        fetch(`http://localhost:8080/api/trip/search/${username}?destination=${searchTerm}`)
+        .then(response => response.json())
+        .then(trips => {
+            const tripList = document.getElementById('tripList');
+            tripList.innerHTML = '';
+            trips.forEach(trip => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${trip.destination}</td>
+                    <td>${trip.startDate}</td>
+                    <td>${trip.endDate}</td>
+                    <td>${trip.description}</td>
+                    <td>
+                        <button class="btn btn-edit" onclick="openEditModal(${trip.id})">编辑</button>
+                        <button class="btn btn-delete" onclick="deleteTrip(${trip.id})">删除</button>
+                    </td>
+                `;
+                tripList.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Error searching trips:', error);
+            alert('搜索行程失败');
+        });
+    }
+</script>
+
+</body>
+</html>

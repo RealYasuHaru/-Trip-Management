@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container, .statistics-container {
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        input[type="text"], input[type="password"], input[type="email"],input[type="date"], textarea, input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+        }
+        .btn-close {
+            background-color: #dc3545;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .statistics-container {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .statistics-container h2 {
+            margin-bottom: 20px;
+        }
+        .statistics-item {
+            margin-bottom: 10px;
+        }
+        .statistics-item strong {
+            display: inline-block;
+            width: 150px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>个人中心</h1>
+
+    <!-- 修改密码模拟框 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('passwordModal')">&times;</span>
+            <h2>修改密码</h2>
+            <form id="passwordForm">
+                <input type="password" id="currentPassword" name="currentPassword" placeholder="当前密码" required>
+                <br>
+                <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
+                <br>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="确认新密码" required>
+                <br>
+                <input type="submit" value="保存">
+            </form>
+        </div>
+    </div>
+
+    <!-- 修改个人信息模拟框 -->
+    <div id="userInfoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('userInfoModal')">&times;</span>
+            <h2>修改个人信息</h2>
+            <form id="userInfoForm">
+                <input type="text" id="fullName" name="fullName" placeholder="姓名" required>
+                <br>
+                <input type="email" id="email" name="email" placeholder="邮箱" required>
+                <br>
+                <input type="text" id="phone" name="phone" placeholder="电话号码" required>
+                <br>
+                <input type="submit" value="保存">
+            </form>
+        </div>
+    </div>
+
+    <!-- 显示个人信息 -->
+    <div class="form-container">
+        <h2>个人信息</h2>
+        <p><strong>用户名:</strong> <span id="username"></span></p>
+        <p><strong>姓名:</strong> <span id="fullNameDisplay"></span></p>
+        <p><strong>邮箱:</strong> <span id="emailDisplay"></span></p>
+        <p><strong>电话号码:</strong> <span id="phoneDisplay"></span></p>
+        <button class="btn btn-edit" onclick="openModal('userInfoModal')">修改个人信息</button>
+        <button class="btn btn-edit" onclick="openModal('passwordModal')">修改密码</button>
+    </div>
+
+    <!-- 行程统计信息 -->
+    <div class="statistics-container">
+        <h2>行程统计</h2>
+        <p id="statisticsText">加载统计信息...</p>
+    </div>
+</div>
+
+<script>
+    const username = new URLSearchParams(window.location.search).get('username');
+    document.getElementById('username').innerText = username;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadUserInfo(username);
+        loadTripStatistics(username);
+    });
+
+    // 修改密码表单提交事件
+    document.getElementById('passwordForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let currentPassword = document.getElementById('currentPassword').value;
+        let newPassword = document.getElementById('newPassword').value;
+        let confirmPassword = document.getElementById('confirmPassword').value;
+        changePassword(currentPassword, newPassword, confirmPassword);
+    });
+
+    // 修改个人信息表单提交事件
+    document.getElementById('userInfoForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let fullName = document.getElementById('fullName').value;
+        let email = document.getElementById('email').value;
+        let phone = document.getElementById('phone').value;
+        updateUserInfo(fullName, email, phone);
+    });
+function changePassword(currentPassword, newPassword, confirmPassword) {
+        const username = new URLSearchParams(window.location.search).get('username'); // 从 URL 获取用户名
+
+        // 校验新密码和确认密码是否一致
+        if (newPassword !== confirmPassword) {
+            alert('新密码与确认密码不一致，请重新输入！');
+            return;
+        }
+
+        const data = {
+            username: username,
+            currentPassword: currentPassword,
+            newPassword: newPassword
+        };
+
+        fetch(`http://localhost:8080/api/user/changePassword`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer your_token_here',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(responseData => {
+            alert('密码修改成功！');
+            closeModal('passwordModal'); // 关闭模态框
+        })
+        .catch(error => console.error('wait', error));
+        function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+        sleep(500).then(() => {
+    location.reload();
+});
+    }
+
+    // 更新个人信息函数
+    function updateUserInfo(fullName, email, phone) {
+        const username = new URLSearchParams(window.location.search).get('username'); // 从 URL 获取用户名
+
+        const data = {
+            username: username,
+            fullName: fullName,
+            email: email,
+            phone: phone
+        };
+
+        fetch(`http://localhost:8080/api/user/update`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer your_token_here',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(responseData => {
+            alert('个人信息更新成功！');
+            closeModal('userInfoModal'); // 关闭模态框
+            // 可选：更新页面显示的用户信息
+            document.getElementById('fullNameDisplay').innerText = fullName;
+            document.getElementById('emailDisplay').innerText = email;
+            document.getElementById('phoneDisplay').innerText = phone;
+        })
+        .catch(error => console.error('Error updating user info:', error));
+        location.reload();
+    }
+
+    // 加载行程统计信息
+ function loadTripStatistics(username) {
+        fetch(`http://localhost:8080/api/trip/statistics?username=${username}`)
+        .then(response => response.json())
+        .then(statistics => {
+            let statisticsText = document.getElementById('statisticsText');
+            statisticsText.innerHTML = `
+                <strong>总行程数:</strong> ${statistics.totalTrips}<br>
+                <strong>平均行程时长:</strong> ${statistics.averageDuration} 天<br>
+                <strong>最长行程:</strong> ${statistics.longestTrip.destination} (${statistics.longestTrip.startDate} 到 ${statistics.longestTrip.endDate})<br>
+                <strong>最常访问目的地:</strong> ${statistics.mostVisitedDestination}
+            `;
+        })
+        .catch(error => console.error('Error loading trip statistics:', error));
+    }
+
+    // 加载用户信息
+    function loadUserInfo(username) {
+        fetch(`http://localhost:8080/api/user/info?username=${username}`)
+        .then(response => response.json())
+        .then(userInfo => {
+            document.getElementById('fullNameDisplay').innerText = userInfo.fullName;
+            document.getElementById('emailDisplay').innerText = userInfo.email;
+            document.getElementById('phoneDisplay').innerText = userInfo.phone;
+        })
+        .catch(error => console.error('Error loading user info:', error));
+    }
+
+    // 打开模拟框
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+    }
+
+    // 关闭模拟框
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
